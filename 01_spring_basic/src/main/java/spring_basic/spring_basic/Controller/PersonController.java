@@ -1,19 +1,39 @@
-package spring_basic.spring_basic.Controller;
+package spring_basic.spring_basic.controller;
 
-import spring_basic.spring_basic.Domain.Person;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+import spring_basic.spring_basic.dto.Person;
+import spring_basic.spring_basic.dto.PersonRequestDto;
+import spring_basic.spring_basic.repository.PersonRepository;
+import spring_basic.spring_basic.service.PersonService;
 
+import java.util.List;
+
+@RequiredArgsConstructor
 @RestController
 public class PersonController {
 
-    @GetMapping("/myinfo")
-    public Person getPerson() {
-        Person person = new Person();
-        person.setName("김스파르타");
-        person.setSex("女");
-        person.setAge(20);
+    private final PersonRepository personRepository;
 
-        return person;
+    private final PersonService personService;
+
+    @GetMapping("/person")
+    public List<Person> getPerson() {return personRepository.findAll();}
+
+    @PostMapping("/person")
+    public Person createPerson(@RequestBody PersonRequestDto requestDto) {
+        Person person = new Person(requestDto);
+        return personRepository.save(person);
+    }
+
+    @PutMapping("/person/{id}")
+    public Long updatePerson(@PathVariable Long id, @RequestBody PersonRequestDto requestDto) {
+        return personService.update(id, requestDto);
+    }
+
+    @DeleteMapping("/person/{id}")
+    public Long deletePerson(@PathVariable Long id) {
+        personRepository.deleteById(id);
+        return id;
     }
 }
